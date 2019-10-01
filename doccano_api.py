@@ -200,7 +200,7 @@ def dummy_project_user_documents():
     project_id = next(iter(list_projects()))['id']
     add_all_user_to_project(project_id)
     DATA_DIR = '.'
-    filename = 'docs_for_doccano.jsonl'
+    filename = 'sample_docs.jsonl'
     jsonl_file = os.path.join(DATA_DIR, filename)
     docs = read_json_lines(jsonl_file)
     # user_id = [u['id'] for u in list_users() if u['id']!=1][0]
