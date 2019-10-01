@@ -1,0 +1,32 @@
+version: '3.5'
+services:
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ${HOST_POSTGRES_PATH}:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+
+  pgadmin:
+    links:
+      - postgres:postgres
+    image: fenglc/pgadmin4
+    volumes:
+      - pgadmin_volume:/root/.pgadmin
+    ports:
+      - "5050:5050"
+    networks:
+      - postgres
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+  pgadmin_volume:
