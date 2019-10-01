@@ -1,0 +1,1 @@
+doccano@git+https://git@github.com/dertilo/doccano.git#egg=doccano

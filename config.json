@@ -1,0 +1,6 @@
+{
+  "user_name": "admin",
+  "password": "password",
+  "host": "localhost",
+  "port": 8000
+}
