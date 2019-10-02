@@ -5,7 +5,7 @@ from pprint import pprint
 from typing import Dict, List
 import requests
 from requests.auth import HTTPBasicAuth
-from util import read_json_lines
+from util.data_io import read_jsonl
 
 path = os.path.dirname(os.path.abspath(__file__))
 with open(path+'/config.json') as f:
@@ -116,16 +116,17 @@ def create_user(username,password,user_id=None,first_name='',last_name='',email=
     assert response.status_code == HTTPStatus.CREATED
     return response.json()
 
-def create_project(project_name = 'testproject'):
+def create_project(project_name = 'testproject',users:List[int]=None):
 
     url = 'http://%s:%d/v1/projects' % (HOST,PORT)
 
-    data = {'name': project_name,
-            'project_type': 'SequenceLabeling',
-            'collaborative_annotation':True,
-            'description': 'example',
-            'guideline': 'example',
-            'resourcetype': 'SequenceLabelingProject'}
+    data = {
+        'name': project_name,
+        'project_type': 'SequenceLabeling',
+        'collaborative_annotation':True,
+        'description': 'example',
+        'guideline': 'example',
+        'resourcetype': 'SequenceLabelingProject'}
 
     response = requests.post(url,
                              data=data,
@@ -136,6 +137,8 @@ def create_project(project_name = 'testproject'):
         print(response.status_code)
         print(response.json())
 
+    created_project = response.json()
+    edit_project(created_project['id'],users=users)
     assert response.status_code == HTTPStatus.CREATED
 
 def list_users()->List[Dict]:
@@ -202,14 +205,19 @@ def dummy_project_user_documents():
     DATA_DIR = '.'
     filename = 'sample_docs.jsonl'
     jsonl_file = os.path.join(DATA_DIR, filename)
-    docs = read_json_lines(jsonl_file)
+    docs = read_jsonl(jsonl_file)
     # user_id = [u['id'] for u in list_users() if u['id']!=1][0]
     create_documents(docs, project_id=project_id,user_id=user_id)
 
 def purge_projects():
     [delete_project(p['id']) for p in list_projects()]
 
-if __name__ == '__main__':
+
+def purge():
     purge_users()
     purge_projects()
-    dummy_project_user_documents()
+
+
+if __name__ == '__main__':
+    purge()
+    # dummy_project_user_documents()
