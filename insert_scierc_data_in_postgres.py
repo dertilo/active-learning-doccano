@@ -8,7 +8,7 @@ from util.data_io import download_data
 
 def scierc_to_postgres(postgres_host,scierc_file:str):
     sqlalchemy_base, sqlalchemy_engine = get_sqlalchemy_base_engine(host=postgres_host)
-    data = data_io.read_jsonsl(scierc_file)
+    data = data_io.read_jsonl(scierc_file)
     data = ({**{'id': json.dumps(d.pop('doc_key'))}, **d} for d in data)
     data = (d for d in data if isinstance(d['id'], str))
     tables = get_tables_by_reflection(sqlalchemy_base.metadata, sqlalchemy_engine)
