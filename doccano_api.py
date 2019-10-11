@@ -15,6 +15,16 @@ ADMIN_PASSWORD = config['password']
 HOST = config['host']
 PORT = config['port']
 
+def obtain_auth_token(user_name=ADMIN_USER_NAME, password=ADMIN_PASSWORD):
+    url = 'http://%s:%d/v1/auth-token' % (HOST,PORT)
+    response = requests.post(url,data={'username':user_name,'password':password})
+    if response.status_code!=HTTPStatus.OK:
+        print(response.status_code)
+        print(response.json())
+    return response.json()['token']
+
+ADMIN_TOKEN=obtain_auth_token(ADMIN_USER_NAME,ADMIN_PASSWORD)
+
 def create_documents(docs: List[Dict],project_id:int,user_id:int):
     url = 'http://%s:%d/v1/projects/%d/docs/upload' % (HOST,PORT,project_id)
 
@@ -34,9 +44,9 @@ def create_documents(docs: List[Dict],project_id:int,user_id:int):
 def list_documents(project_id:int, user_name=ADMIN_USER_NAME, password=ADMIN_PASSWORD)->List[Dict]:
     url = 'http://%s:%d/v1/projects/%d/docs' % (HOST,PORT,project_id)
 
-    response = requests.get(url,
-                             auth=HTTPBasicAuth(user_name, password),
-                             )
+    token=obtain_auth_token(user_name,password)
+    response = requests.get(url,headers={'Authorization':'token %s'%token})
+
     if response.status_code!=HTTPStatus.OK:
         print(response.status_code)
         print(response.json())
@@ -46,9 +56,7 @@ def list_documents(project_id:int, user_name=ADMIN_USER_NAME, password=ADMIN_PAS
 def get_document(project_id,doc_id):
     url = 'http://%s:%d/v1/projects/%d/docs/%d' % (HOST,PORT,project_id,doc_id)
 
-    response = requests.get(url,
-                            auth=HTTPBasicAuth(ADMIN_USER_NAME, ADMIN_PASSWORD),
-                            )
+    response = requests.get(url,headers={'Authorization':'token %s'%ADMIN_TOKEN})
     assert response.status_code==HTTPStatus.OK
     return response.json()
 
